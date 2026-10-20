@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiikawa Flashcard Ultra - Tiếng Anh 8 Global Success</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        chiikawa: { pink: '#ffb7c5', yellow: '#fff3b0', blue: '#a0e7e5', mint: '#b4f8c8', purple: '#dda7ff' },
+                        primary: { 50: '#fdf4f7', 100: '#fbe8ef', 500: '#ff6b97', 600: '#e04f7a', 700: '#bd3b61' },
+                        accent: { 500: '#38bdf8', 600: '#0284c7' }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-attachment: fixed; }
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .chiikawa-float { animation: float 3s ease-in-out infinite; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: #ffb7c5; border-radius: 9999px; }
+        .dark ::-webkit-scrollbar-thumb { background: #64748b; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-slate-900 dark:via-purple-950/20 dark:to-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300 flex flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-pink-100 dark:border-slate-800 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('study')">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-pink-400 via-purple-400 to-yellow-300 flex items-center justify-center text-2xl shadow-md chiikawa-float">
+                    🐹
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg bg-gradient-to-r from-pink-500 via-purple-500 to-accent-500 bg-clip-text text-transparent flex items-center gap-2">
+                        Chiikawa Flashcard Ultra
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-pink-100 dark:bg-pink-900/50 text-pink-600 dark:text-pink-300 font-semibold hidden sm:inline-block">✨ Hachiware Edition</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Tiếng Anh 8 - Global Success (Full 12 Units)</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-yellow-400/20 text-amber-600 dark:text-yellow-300 font-bold text-sm shadow-inner">
+                    <span>⭐</span>
+                    <span id="streak-count">1</span>
+                    <span class="hidden sm:inline text-xs">ngày</span>
+                </div>
+                <button onclick="toggleDarkMode()" class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-pink-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 shadow-sm transition-all">
+                    <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+                <button onclick="toggleSound()" class="p-2.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-pink-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 shadow-sm transition-all">
+                    <i id="sound-icon" class="fa-solid fa-volume-high text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col gap-6">
+
+        <!-- Controls & Navigation -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white/90 dark:bg-slate-800/80 backdrop-blur-md p-4 rounded-3xl border border-pink-100 dark:border-slate-700/60 shadow-lg shadow-pink-500/5">
+            <div class="flex items-center gap-3 flex-1 min-w-[240px]">
+                <div class="w-9 h-9 rounded-xl bg-pink-100 dark:bg-slate-700 flex items-center justify-center text-pink-500 text-lg">
+                    📖
+                </div>
+                <select id="deck-select" onchange="changeDeck(this.value)" class="w-full bg-slate-50 dark:bg-slate-700/70 border-0 text-slate-800 dark:text-slate-100 font-bold rounded-2xl px-4 py-2.5 focus:ring-2 focus:ring-pink-400 cursor-pointer text-sm">
+                </select>
+                <button onclick="openNewDeckModal()" class="p-2.5 bg-gradient-to-r from-pink-500 to-purple-500 hover:opacity-90 text-white rounded-2xl transition-all shadow-md shadow-pink-500/30" title="Tạo bộ thẻ mới">
+                    <i class="fa-solid fa-plus text-base"></i>
+                </button>
+            </div>
+
+            <div class="flex bg-slate-100 dark:bg-slate-900/80 p-1.5 rounded-2xl gap-1 overflow-x-auto">
+                <button id="tab-study-btn" onclick="switchTab('study')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white dark:bg-slate-800 text-pink-600 dark:text-pink-400 shadow-md whitespace-nowrap">
+                    <i class="fa-solid fa-clone mr-1.5"></i>Học Thẻ
+                </button>
+                <button id="tab-quiz-btn" onclick="switchTab('quiz')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-brain mr-1.5"></i>Trắc Nghiệm
+                </button>
+                <button id="tab-game-btn" onclick="switchTab('game')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-gamepad mr-1.5"></i>Ghép Cặp
+                </button>
+                <button id="tab-manage-btn" onclick="switchTab('manage')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-list-check mr-1.5"></i>Quản Lý
+                </button>
+            </div>
+        </div>
+
+        <!-- TAB 1: STUDY (Flashcard) -->
+        <section id="tab-study" class="flex-1 flex flex-col items-center justify-center gap-6 py-2">
+            <div class="w-full max-w-md flex flex-col gap-2">
+                <div class="flex justify-between text-xs font-bold text-slate-500 dark:text-slate-400 px-1">
+                    <span class="flex items-center gap-1.5">🌱 Tiến độ học tập</span>
+                    <span id="progress-text" class="text-pink-500 font-extrabold">0 / 0</span>
+                </div>
+                <div class="w-full h-3 bg-white dark:bg-slate-800 rounded-full overflow-hidden p-0.5 shadow-inner border border-pink-100 dark:border-slate-700">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-pink-400 via-purple-400 to-sky-400 rounded-full transition-all duration-300 w-0"></div>
+                </div>
+            </div>
+
+            <!-- Flashcard Box -->
+            <div class="w-full max-w-md h-80 sm:h-88 perspective-1000 cursor-pointer" onclick="flipCard()">
+                <div id="flashcard" class="w-full h-full relative transform-style-3d transition-transform duration-500 rounded-3xl shadow-2xl border-2 border-pink-100/80 dark:border-slate-700/60 bg-white dark:bg-slate-800">
+                    
+                    <!-- Mặt trước -->
+                    <div class="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-b from-white to-pink-50/30 dark:from-slate-800 dark:to-slate-800/90 rounded-3xl p-6 flex flex-col justify-between items-center text-center">
+                        <div class="w-full flex justify-between items-center text-xs font-bold text-pink-400">
+                            <span class="px-3 py-1 rounded-full bg-pink-100/70 dark:bg-pink-900/40 uppercase tracking-wider">Mặt Trước 🌸</span>
+                            <button onclick="speakWord(event)" class="p-2.5 rounded-2xl hover:bg-pink-100 dark:hover:bg-slate-700 text-pink-500 transition-colors shadow-sm"><i class="fa-solid fa-volume-high text-lg"></i></button>
+                        </div>
+                        <div class="my-auto px-4 flex flex-col items-center gap-2">
+                            <div class="text-3xl chiikawa-float">🐱🐰</div>
+                            <h2 id="card-word" class="text-3xl sm:text-4xl font-extrabold text-slate-800 dark:text-slate-100 break-words">---</h2>
+                            <p id="card-ipa" class="text-sm text-pink-600 dark:text-pink-400 font-semibold px-3 py-1 rounded-full bg-pink-50 dark:bg-pink-950/50 mt-1"></p>
+                        </div>
+                        <div class="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1.5 font-medium"><i class="fa-solid fa-hand-pointer animate-bounce text-pink-400"></i> Bấm vào thẻ để lật xem nghĩa</div>
+                    </div>
+
+                    <!-- Mặt sau -->
+                    <div class="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-600 text-white rounded-3xl p-6 flex flex-col justify-between items-center text-center shadow-inner">
+                        <div class="w-full flex justify-between items-center text-xs font-bold text-pink-100">
+                            <span class="px-3 py-1 rounded-full bg-white/20 uppercase tracking-wider">Mặt Sau ✨</span>
+                            <button onclick="speakWord(event, true)" class="p-2.5 rounded-2xl hover:bg-white/20 text-white transition-colors"><i class="fa-solid fa-volume-high text-lg"></i></button>
+                        </div>
+                        <div class="my-auto px-4 flex flex-col items-center gap-2">
+                            <div class="text-3xl chiikawa-float">⭐️</div>
+                            <h3 id="card-meaning" class="text-2xl sm:text-3xl font-extrabold break-words">---</h3>
+                            <p id="card-example" class="text-xs sm:text-sm text-pink-100 mt-3 italic bg-black/20 p-3 rounded-2xl border border-white/10 shadow-sm"></p>
+                        </div>
+                        <div class="text-xs text-pink-200 flex items-center gap-1.5 font-medium"><i class="fa-solid fa-rotate-left"></i> Bấm để quay lại mặt trước</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-4 w-full max-w-md">
+                <button onclick="markCard(false)" class="flex-1 py-3.5 px-4 rounded-2xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-300 font-bold flex items-center justify-center gap-2 border border-rose-200 dark:border-rose-800/60 transition-all shadow-sm">
+                    <i class="fa-solid fa-xmark text-lg"></i> Chưa thuộc 💧
+                </button>
+                <button onclick="markCard(true)" class="flex-1 py-3.5 px-4 rounded-2xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300 font-bold flex items-center justify-center gap-2 border border-emerald-200 dark:border-emerald-800/60 transition-all shadow-sm">
+                    <i class="fa-solid fa-check text-lg"></i> Đã thuộc 🎉
+                </button>
+            </div>
+        </section>
+
+        <!-- TAB 2: QUIZ -->
+        <section id="tab-quiz" class="hidden flex-1 flex flex-col items-center justify-center gap-6 py-2">
+            <div class="w-full max-w-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-xl border border-pink-100 dark:border-slate-700 flex flex-col gap-6">
+                <div class="flex justify-between items-center border-b border-pink-50 dark:border-slate-700 pb-4">
+                    <span class="text-sm font-extrabold text-pink-500 flex items-center gap-1.5"><i class="fa-solid fa-circle-question"></i> Thử Thách Trắc Nghiệm</span>
+                    <span id="quiz-score" class="text-sm font-bold px-3 py-1 rounded-full bg-pink-100 dark:bg-pink-900/50 text-pink-600 dark:text-pink-300">Điểm: 0 🌟</span>
+                </div>
+                <div class="text-center py-4 flex flex-col items-center gap-2">
+                    <div class="text-2xl">📝</div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nghĩa chính xác của từ này là gì?</p>
+                    <h2 id="quiz-question" class="text-3xl font-extrabold text-slate-800 dark:text-slate-100">---</h2>
+                </div>
+                <div id="quiz-options" class="grid grid-cols-1 gap-3"></div>
+                <button onclick="startQuiz()" class="w-full py-3.5 bg-slate-100 hover:bg-pink-50 dark:bg-slate-700 dark:hover:bg-slate-600 font-bold rounded-2xl text-sm transition-all text-slate-700 dark:text-slate-200 shadow-sm">Câu hỏi tiếp theo 🚀</button>
+            </div>
+        </section>
+
+        <!-- TAB 3: GAME -->
+        <section id="tab-game" class="hidden flex-1 flex flex-col items-center justify-center gap-6 py-2">
+            <div class="w-full max-w-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-xl border border-pink-100 dark:border-slate-700 flex flex-col gap-6 text-center">
+                <div class="flex flex-col gap-1">
+                    <h3 class="text-xl font-extrabold text-pink-500 flex items-center justify-center gap-2"><span class="text-2xl">🧩</span> Ghép Cặp Từ Vựng Chiikawa</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Chọn 1 từ tiếng Anh và 1 nghĩa tiếng Việt tương ứng để nối thẻ!</p>
+                </div>
+                <div id="game-board" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+                <div class="flex justify-between items-center text-sm font-semibold bg-pink-50 dark:bg-slate-900 p-4 rounded-2xl">
+                    <span>Điểm số: <strong id="game-score" class="text-pink-500 text-lg">0</strong> 🎮</span>
+                    <button onclick="initGame()" class="px-5 py-2.5 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl shadow-md hover:opacity-90 font-bold transition-all">Chơi Lại 🔄</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: MANAGE -->
+        <section id="tab-manage" class="hidden flex-1 flex flex-col gap-6 py-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-5 rounded-3xl shadow-md border border-pink-100 dark:border-slate-700 flex flex-col gap-3">
+                    <h3 class="font-bold text-base text-pink-500 flex items-center gap-2"><i class="fa-solid fa-plus-circle"></i> Thêm Thẻ Mới</h3>
+                    <input id="input-word" type="text" placeholder="Từ vựng (English)..." class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-sm focus:ring-2 focus:ring-pink-400">
+                    <input id="input-ipa" type="text" placeholder="Phiên âm IPA..." class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-sm focus:ring-2 focus:ring-pink-400">
+                    <input id="input-meaning" type="text" placeholder="Nghĩa tiếng Việt..." class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-sm focus:ring-2 focus:ring-pink-400">
+                    <input id="input-example" type="text" placeholder="Ví dụ câu..." class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-sm focus:ring-2 focus:ring-pink-400">
+                    <button onclick="addSingleCard()" class="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-2xl text-sm shadow-md hover:opacity-90 transition-all">Lưu Thẻ Ngay ✨</button>
+                </div>
+
+                <div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-5 rounded-3xl shadow-md border border-pink-100 dark:border-slate-700 flex flex-col gap-3">
+                    <h3 class="font-bold text-base text-accent-500 flex items-center gap-2"><i class="fa-solid fa-file-import"></i> Nhập Nhanh Danh Sách</h3>
+                    <textarea id="bulk-input" rows="5" placeholder="Cấu trúc: Từ - Nghĩa&#10;apple - quả táo&#10;banana - quả chuối" class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-sm resize-none focus:ring-2 focus:ring-accent-400"></textarea>
+                    <button onclick="importBulkCards()" class="w-full py-3 bg-gradient-to-r from-sky-400 to-blue-500 text-white font-bold rounded-2xl text-sm shadow-md hover:opacity-90 transition-all">Thêm Hàng Loạt 📥</button>
+                </div>
+            </div>
+
+            <div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md p-5 rounded-3xl shadow-md border border-pink-100 dark:border-slate-700 flex flex-col gap-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-extrabold text-base flex items-center gap-2">📚 Danh Sách Từ Vựng (<span id="manage-card-count" class="text-pink-500">0</span> từ)</h3>
+                    <button onclick="deleteCurrentDeck()" class="text-xs text-rose-500 hover:text-rose-600 font-bold px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 transition-all"><i class="fa-solid fa-trash mr-1"></i>Xóa Bộ Thẻ Này</button>
+                </div>
+                <div id="card-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-1"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal New Deck -->
+    <div id="modal-new-deck" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-pink-200 dark:border-slate-700 flex flex-col gap-4">
+            <h3 class="font-extrabold text-lg text-pink-500 flex items-center gap-2">🌸 Tạo Bộ Thẻ Mới</h3>
+            <input id="new-deck-name" type="text" placeholder="Tên bộ thẻ (Ví dụ: Unit 13)..." class="w-full px-4 py-3 rounded-2xl bg-slate-100 dark:bg-slate-700 border-0 text-sm focus:ring-2 focus:ring-pink-400">
+            <div class="flex gap-2 justify-end">
+                <button onclick="closeNewDeckModal()" class="px-4 py-2.5 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm">Hủy</button>
+                <button onclick="createNewDeck()" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold text-sm shadow-md">Tạo Mới ✨</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Data & App Logic -->
+    <script>
+        const initialDecks = {
+            "Tiếng Anh 8 - Unit 1: Leisure Time": [
+                { word: "balance", ipa: "/ˈbæləns/", meaning: "(n) sự cân bằng", example: "We need a balance between study and play." },
+                { word: "bracelet", ipa: "/ˈbreɪslət/", meaning: "(n) vòng đeo tay", example: "She wears a silver bracelet." },
+                { word: "boredom", ipa: "/ˈbɔːdəm/", meaning: "(n) sự chán nản", example: "He yawned with boredom." },
+                { word: "carve", ipa: "/kɑːv/", meaning: "(v) chạm, khắc", example: "He carves wood into animals." },
+                { word: "code", ipa: "/kəʊd/", meaning: "(n, v) mật mã / lập trình", example: "She is learning how to code." },
+                { word: "comedy", ipa: "/ˈkɒmədi/", meaning: "(n) phim hài", example: "We watched a funny comedy." },
+                { word: "craft", ipa: "/krɑːft/", meaning: "(n) đồ thủ công", example: "She likes making crafts." },
+                { word: "craft kit", ipa: "/krɑːft kɪt/", meaning: "(n) bộ dụng cụ làm thủ công", example: "I bought a new craft kit." },
+                { word: "crazy", ipa: "/ˈkreɪzi/", meaning: "(adj) say mê, phát cuồng", example: "He is crazy about football." },
+                { word: "detest", ipa: "/dɪˈtest/", meaning: "(v) ghét cay ghét đắng", example: "I detest waking up early." },
+                { word: "DIY", ipa: "/ˌdiː aɪ ˈwaɪ/", meaning: "(n) đồ tự làm", example: "He enjoys doing DIY." },
+                { word: "dog-sighting", ipa: "/dɒɡ ˈsaɪtɪŋ/", meaning: "(n) ngắm chó", example: "Dog-sighting is a fun hobby." },
+                { word: "e-reader", ipa: "/ˈiː riːdə(r)/", meaning: "(n) máy đọc sách điện tử", example: "I read books on my e-reader." },
+                { word: "fancy", ipa: "/ˈfænsi/", meaning: "(v) thích, mến", example: "Do you fancy a cup of tea?" },
+                { word: "fold", ipa: "/fəʊld/", meaning: "(v) gấp, gập", example: "Fold the paper carefully." },
+                { word: "glued to", ipa: "/ɡluːd tuː/", meaning: "(idiom) dán mắt vào", example: "He is glued to the screen." },
+                { word: "hang out", ipa: "/hæŋ aʊt/", meaning: "(phr v) đi chơi với bạn bè", example: "Let's hang out this weekend." },
+                { word: "hooked", ipa: "/hʊkt/", meaning: "(adj) bị lôi cuốn, mê mẩn", example: "I am hooked on this game." },
+                { word: "internet access", ipa: "/ˈɪntənet ˈækses/", meaning: "(n) truy cập internet", example: "The room has free internet access." },
+                { word: "leisure", ipa: "/ˈleʒə(r)/", meaning: "(n) thời gian rảnh rỗi", example: "What do you do in your leisure time?" },
+                { word: "melody", ipa: "/ˈmelədi/", meaning: "(n) giai điệu", example: "The song has a sweet melody." },
+                { word: "message", ipa: "/ˈmesɪdʒ/", meaning: "(v, n) nhắn tin / tin nhắn", example: "Send me a message." },
+                { word: "miniature", ipa: "/ˈmɪnətʃə(r)/", meaning: "(adj) thu nhỏ", example: "She collects miniature cars." },
+                { word: "muscle", ipa: "/ˈmʌsl/", meaning: "(n) cơ bắp", example: "Exercise builds muscles." },
+                { word: "origami", ipa: "/ˌɒrɪˈɡɑːmi/", meaning: "(n) nghệ thuật gấp giấy", example: "Origami is a Japanese art." },
+                { word: "poetry", ipa: "/ˈpəʊətri/", meaning: "(n) thơ ca", example: "He loves reading poetry." },
+                { word: "pop-up", ipa: "/ˈpɒp ʌp/", meaning: "(n) sách nổi", example: "This is a pop-up book." },
+                { word: "relax", ipa: "/rɪˈlæks/", meaning: "(v) thư giãn", example: "Listen to music to relax." },
+                { word: "satisfied", ipa: "/ˈsætɪsfaɪd/", meaning: "(adj) hài lòng", example: "She was satisfied with her result." },
+                { word: "save", ipa: "/seɪv/", meaning: "(v) tiết kiệm", example: "Save money for the future." },
+                { word: "share", ipa: "/ʃeə(r)/", meaning: "(v) chia sẻ", example: "Share your toys with friends." },
+                { word: "socialise", ipa: "/ˈsəʊʃəlaɪz/", meaning: "(v) giao lưu, kết bạn", example: "It's good to socialise." },
+                { word: "surf the net", ipa: "/sɜːf ðə net/", meaning: "(v) lướt mạng", example: "He loves surfing the net." },
+                { word: "sweet", ipa: "/swiːt/", meaning: "(n, adj) kẹo / ngọt", example: "I love sweet things." },
+                { word: "trick", ipa: "/trɪk/", meaning: "(n) mẹo, thủ thuật", example: "Can you show me a magic trick?" },
+                { word: "unusual", ipa: "/ʌnˈjuːʒuəl/", meaning: "(adj) bất thường", example: "That is an unusual bird." },
+                { word: "weird", ipa: "/wɪəd/", meaning: "(adj) kỳ quặc, kỳ lạ", example: "I heard a weird noise." }
+            ],
+            "Tiếng Anh 8 - Unit 2: Life in Countryside": [
+                { word: "catch", ipa: "/kætʃ/", meaning: "(v) bắt lấy", example: "He tried to catch the ball." },
+                { word: "bamboo dancing", ipa: "/bæmˈbuː ˈdɑːnsɪŋ/", meaning: "(n) múa sạp", example: "They are performing bamboo dancing." },
+                { word: "cattle", ipa: "/ˈkætl/", meaning: "(n) gia súc", example: "Cattle are grazing in the field." },
+                { word: "combine harvester", ipa: "/ˈkɒmbaɪn ˈhɑːvɪstə(r)/", meaning: "(n) máy gặt đập liên hợp", example: "Harvesters collect rice." },
+                { word: "convenient", ipa: "/kənˈviːniənt/", meaning: "(adj) tiện lợi", example: "Living in the city is convenient." },
+                { word: "crop", ipa: "/krɒp/", meaning: "(n) vụ mùa", example: "Farmers harvest crops." },
+                { word: "cyclist", ipa: "/ˈsaɪklɪst/", meaning: "(n) người đi xe đạp", example: "Cyclists must follow rules." },
+                { word: "drying", ipa: "/draɪɪŋ/", meaning: "(n) việc phơi khô", example: "Drying rice in the sun." },
+                { word: "feed", ipa: "/fiːd/", meaning: "(v) cho ăn", example: "It's time to feed the pigs." },
+                { word: "generous", ipa: "/ˈdʒenərəs/", meaning: "(adj) hào phóng", example: "Local people are generous." },
+                { word: "harvest", ipa: "/ˈhɑːvɪst/", meaning: "(n, v) thu hoạch", example: "The harvest is successful." },
+                { word: "herdsman", ipa: "/ˈhɜːdzmən/", meaning: "(n) người chăn gia súc", example: "The herdsman looks after cows." },
+                { word: "kite", ipa: "/kaɪt/", meaning: "(n) con diều", example: "Children fly kites." },
+                { word: "load", ipa: "/ləʊd/", meaning: "(v) chất, chở hàng", example: "Load rice onto the truck." },
+                { word: "nomad", ipa: "/ˈnəʊmæd/", meaning: "(n) người du mục", example: "Nomads move frequently." },
+                { word: "nomadic", ipa: "/nəʊˈmædɪk/", meaning: "(adj) thuộc về du mục", example: "Nomadic life." },
+                { word: "paddy field", ipa: "/ˈpædi fiːld/", meaning: "(n) cánh đồng lúa", example: "Green paddy fields." },
+                { word: "pasture", ipa: "/ˈpɑːstʃə(r)/", meaning: "(n) đồng cỏ", example: "Sheep eat grass on pasture." },
+                { word: "peaceful", ipa: "/ˈpiːsfl/", meaning: "(adj) yên bình", example: "A peaceful village." },
+                { word: "picturesque", ipa: "/ˌpɪktʃəˈresk/", meaning: "(adj) đẹp như tranh vẽ", example: "A picturesque landscape." },
+                { word: "pod", ipa: "/pɒd/", meaning: "(n) vỏ đậu", example: "Pea pods." },
+                { word: "resentment", ipa: "/rɪˈzentmənt/", meaning: "(n) sự phẫn uất", example: "Feeling resentment." },
+                { word: "rice-transplanting", ipa: "/raɪs trænzˈplɑːntɪŋ/", meaning: "(n) việc cấy lúa", example: "Farmers do rice-transplanting." },
+                { word: "straw", ipa: "/strɔː/", meaning: "(n) rơm", example: "Cows eat straw." },
+                { word: "vast", ipa: "/vɑːst/", meaning: "(adj) rộng lớn", example: "The vast field." },
+                { word: "well-trained", ipa: "/ˌwel ˈtreɪnd/", meaning: "(adj) lành nghề", example: "Well-trained workers." }
+            ],
+            "Tiếng Anh 8 - Unit 3: Teenagers": [
+                { word: "academic", ipa: "/ˌækəˈdemɪk/", meaning: "(adj) thuộc về học tập", example: "Good academic results." },
+                { word: "act out", ipa: "/ækt aʊt/", meaning: "(phr v) diễn kịch", example: "Act out the dialogue." },
+                { word: "addicted", ipa: "/əˈdɪktɪd/", meaning: "(adj) nghiện", example: "Addicted to games." },
+                { word: "addiction", ipa: "/əˈdɪkʃn/", meaning: "(n) sự nghiện", example: "Internet addiction." },
+                { word: "bully", ipa: "/ˈbʊli/", meaning: "(v, n) bắt nạt", example: "Stop bullying." },
+                { word: "calm", ipa: "/kɑːm/", meaning: "(adj) bình tĩnh", example: "Please stay calm." },
+                { word: "cheer up", ipa: "/tʃɪə(r) ʌp/", meaning: "(phr v) vui lên", example: "Cheer up!" },
+                { word: "cluttered", ipa: "/ˈklʌtəd/", meaning: "(adj) bừa bộn", example: "A cluttered room." },
+                { word: "concentrate", ipa: "/ˈkɒnsntreɪt/", meaning: "(v) tập trung", example: "Concentrate on study." },
+                { word: "craft club", ipa: "/krɑːft klʌb/", meaning: "(n) CLB thủ công", example: "Join the craft club." },
+                { word: "cyberbullying", ipa: "/ˈsaɪbəbʊliɪŋ/", meaning: "(n) bắt nạt trên mạng", example: "Prevent cyberbullying." },
+                { word: "distract", ipa: "/dɪˈstrækt/", meaning: "(v) làm sao lãng", example: "Noise distracts me." },
+                { word: "expect", ipa: "/ɪkˈspekt/", meaning: "(v) kỳ vọng", example: "Expect high scores." },
+                { word: "forum", ipa: "/ˈfɔːrəm/", meaning: "(n) diễn đàn", example: "School forum." },
+                { word: "help-line", ipa: "/ˈhelplaɪn/", meaning: "(n) đường dây trợ giúp", example: "Call the help-line." },
+                { word: "midterm test", ipa: "/ˈmɪdtɜːm test/", meaning: "(n) kiểm tra giữa kỳ", example: "Midterm tests are coming." },
+                { word: "notification", ipa: "/ˌnəʊtɪfɪˈkeɪʃn/", meaning: "(n) thông báo", example: "Turn off notifications." },
+                { word: "online game", ipa: "/ˈɒnlaɪn ɡeɪm/", meaning: "(n) trò chơi trực tuyến", example: "Play online games." },
+                { word: "peer", ipa: "/pɪə(r)/", meaning: "(n) bạn cùng lứa", example: "Peer support." },
+                { word: "peer pressure", ipa: "/pɪə ˈpreʃə(r)/", meaning: "(n) áp lực bạn bè", example: "Dealing with peer pressure." },
+                { word: "pressure", ipa: "/ˈpreʃə(r)/", meaning: "(n) áp lực", example: "Exam pressure." },
+                { word: "priority", ipa: "/praɪˈɒrəti/", meaning: "(n) sự ưu tiên", example: "Study is my top priority." },
+                { word: "relaxing", ipa: "/rɪˈlæksɪŋ/", meaning: "(adj) thư giãn", example: "Relaxing music." },
+                { word: "reliable", ipa: "/rɪˈlaɪəbl/", meaning: "(adj) đáng tin cậy", example: "A reliable friend." },
+                { word: "solution", ipa: "/səˈluːʃn/", meaning: "(n) giải pháp", example: "Find a solution." },
+                { word: "stressed", ipa: "/strest/", meaning: "(adj) căng thẳng", example: "Feeling stressed." },
+                { word: "upload", ipa: "/ˌʌpˈləʊd/", meaning: "(v) tải lên", example: "Upload videos." },
+                { word: "upset", ipa: "/ʌpˈset/", meaning: "(adj) buồn bã", example: "Don't be upset." },
+                { word: "webinar", ipa: "/ˈwebɪnɑː(r)/", meaning: "(n) hội thảo trực tuyến", example: "Attend a webinar." }
+            ],
+            "Tiếng Anh 8 - Unit 4: Ethnic Groups": [
+                { word: "basket", ipa: "/ˈbɑːskɪt/", meaning: "(n) cái giỏ", example: "Bamboo basket." },
+                { word: "bilingual", ipa: "/baɪˈlɪŋɡwəl/", meaning: "(adj) song ngữ", example: "Bilingual children." },
+                { word: "communal house", ipa: "/kəˈmjuːnl haʊs/", meaning: "(n) nhà rông", example: "Village communal house." },
+                { word: "costume", ipa: "/ˈkɒstjuːm/", meaning: "(n) trang phục", example: "Traditional costume." },
+                { word: "cultural", ipa: "/ˈkʌltʃərəl/", meaning: "(adj) thuộc văn hóa", example: "Cultural heritage." },
+                { word: "custom", ipa: "/ˈkʌstəm/", meaning: "(n) phong tục", example: "Local customs." },
+                { word: "diverse", ipa: "/daɪˈvɜːs/", meaning: "(adj) đa dạng", example: "Diverse culture." },
+                { word: "diversity", ipa: "/daɪˈvɜːsəti/", meaning: "(n) sự đa dạng", example: "Cultural diversity." },
+                { word: "ethnic", ipa: "/ˈeθnɪk/", meaning: "(adj) thuộc dân tộc", example: "Ethnic groups." },
+                { word: "ethnicity", ipa: "/eθˈnɪsəti/", meaning: "(n) tính dân tộc", example: "Different ethnicities." },
+                { word: "feature", ipa: "/ˈfiːtʃə(r)/", meaning: "(n) nét đặc trưng", example: "Unique features." },
+                { word: "festival", ipa: "/ˈfestɪvl/", meaning: "(n) lễ hội", example: "Spring festival." },
+                { word: "flute", ipa: "/fluːt/", meaning: "(n) cây sáo", example: "Playing the flute." },
+                { word: "folk dance", ipa: "/fəʊk dɑːns/", meaning: "(n) múa dân gian", example: "Performing folk dances." },
+                { word: "gong", ipa: "/ɡɒŋ/", meaning: "(n) cồng chiêng", example: "Playing gongs." },
+                { word: "heritage", ipa: "/ˈherɪtɪdʒ/", meaning: "(n) di sản", example: "World heritage." },
+                { word: "majority", ipa: "/məˈdʒɒrəti/", meaning: "(n) đa số", example: "The majority group." },
+                { word: "minority", ipa: "/maɪˈnɒrəti/", meaning: "(n) thiểu số", example: "Ethnic minority." },
+                { word: "open-air", ipa: "/ˌəʊpən ˈeə(r)/", meaning: "(adj) ngoài trời", example: "Open-air market." },
+                { word: "ornament", ipa: "/ˈɔːnəmənt/", meaning: "(n) đồ trang trí", example: "Silver ornaments." },
+                { word: "post", ipa: "/pəʊst/", meaning: "(n) cái cột nhà", example: "Stilt house post." },
+                { word: "ritual", ipa: "/ˈrɪtʃuəl/", meaning: "(n) nghi lễ", example: "Religious ritual." },
+                { word: "stilt house", ipa: "/stɪlt haʊs/", meaning: "(n) nhà sàn", example: "Living in stilt houses." },
+                { word: "terrace", ipa: "/ˈterəs/", meaning: "(n) ruộng bậc thang", example: "Rice terraces." },
+                { word: "weave", ipa: "/wiːv/", meaning: "(v) dệt vải", example: "Weaving cloth." }
+            ],
+            "Tiếng Anh 8 - Unit 5: Our Customs & Traditions": [
+                { word: "abroad", ipa: "/əˈbrɔːd/", meaning: "(adv) ở nước ngoài", example: "Travel abroad." },
+                { word: "accept", ipa: "/əkˈsept/", meaning: "(v) chấp nhận", example: "Accept the invitation." },
+                { word: "ancestor", ipa: "/ˈænsestə(r)/", meaning: "(n) tổ tiên", example: "Worship ancestors." },
+                { word: "appreciate", ipa: "/əˈpriːʃieɪt/", meaning: "(v) trân trọng", example: "Appreciate your help." },
+                { word: "beloved", ipa: "/bɪˈlʌvɪd/", meaning: "(adj) được yêu quý", example: "Beloved family." },
+                { word: "congratulate", ipa: "/kənˈɡrætʃuleɪt/", meaning: "(v) chúc mừng", example: "Congratulate him on winning." },
+                { word: "custom", ipa: "/ˈkʌstəm/", meaning: "(n) phong tục", example: "Traditional customs." },
+                { word: "expression", ipa: "/ɪkˈspreʃn/", meaning: "(n) sự biểu lộ", example: "Facial expressions." },
+                { word: "generation", ipa: "/ˌdʒenəˈreɪʃn/", meaning: "(n) thế hệ", example: "Passed down generations." },
+                { word: "generosity", ipa: "/ˌdʒenəˈrɒsəti/", meaning: "(n) sự hào phóng", example: "Their great generosity." },
+                { word: "host", ipa: "/həʊst/", meaning: "(n) chủ nhà", example: "The friendly host." },
+                { word: "knife", ipa: "/naɪf/", meaning: "(n) con dao", example: "Table knife." },
+                { word: "local", ipa: "/ˈləʊkl/", meaning: "(adj, n) địa phương", example: "Local people." },
+                { word: "offspring", ipa: "/ˈɒfsprɪŋ/", meaning: "(n) con cháu", example: "Animal offspring." },
+                { word: "pass down", ipa: "/pɑːs daʊn/", meaning: "(phr v) truyền lại", example: "Pass down traditions." },
+                { word: "platter", ipa: "/ˈplætə(r)/", meaning: "(n) mâm, đĩa to", example: "Fruit platter." },
+                { word: "presentation", ipa: "/ˌpriːznˈteɪʃn/", meaning: "(n) bài thuyết trình", example: "Give a presentation." },
+                { word: "privacy", ipa: "/ˈprɪvəsi/", meaning: "(n) sự riêng tư", example: "Personal privacy." },
+                { word: "respect", ipa: "/rɪˈspekt/", meaning: "(v, n) kính trọng", example: "Respect teachers." },
+                { word: "sharp", ipa: "/ʃɑːp/", meaning: "(adj) sắc, nhọn", example: "Sharp knife." },
+                { word: "spotless", ipa: "/ˈspɒtləs/", meaning: "(adj) sạch không tì vết", example: "Spotless kitchen." },
+                { word: "table manners", ipa: "/ˈteɪbl mænəz/", meaning: "(n) phép tắc ăn uống", example: "Good table manners." },
+                { word: "tradition", ipa: "/trəˈdɪʃn/", meaning: "(n) truyền thống", example: "Family tradition." },
+                { word: "worship", ipa: "/ˈwɜːʃɪp/", meaning: "(v) thờ cúng", example: "Worship ancestors." }
+            ],
+            "Tiếng Anh 8 - Unit 6: Lifestyles": [
+                { word: "balance", ipa: "/ˈbæləns/", meaning: "(n) sự cân bằng", example: "Work-life balance." },
+                { word: "campfire", ipa: "/ˈkæmpfaɪə(r)/", meaning: "(n) lửa trại", example: "Sit around the campfire." },
+                { word: "connected", ipa: "/kəˈnektɪd/", meaning: "(adj) được kết nối", example: "Stay connected." },
+                { word: "dogsled", ipa: "/ˈdɒɡsled/", meaning: "(n) xe trượt tuyết chó kéo", example: "Riding a dogsled." },
+                { word: "face-to-face", ipa: "/ˌfeɪs tə ˈfeɪs/", meaning: "(adj, adv) trực tiếp", example: "Face-to-face talk." },
+                { word: "firewood", ipa: "/ˈfaɪəwʊd/", meaning: "(n) củi", example: "Collect firewood." },
+                { word: "generation gap", ipa: "/ˌdʒenəˈreɪʃn ɡæp/", meaning: "(n) khoảng cách thế hệ", example: "Bridge the generation gap." },
+                { word: "habit", ipa: "/ˈhæbɪt/", meaning: "(n) thói quen", example: "Good habits." },
+                { word: "igloo", ipa: "/ˈɪɡluː/", meaning: "(n) nhà lều tuyết", example: "Build an igloo." },
+                { word: "interaction", ipa: "/ˌɪntərˈækʃn/", meaning: "(n) sự tương tác", example: "Social interaction." },
+                { word: "lifestyle", ipa: "/ˈlaɪfstaɪl/", meaning: "(n) lối sống", example: "Healthy lifestyle." },
+                { word: "native", ipa: "/ˈneɪtɪv/", meaning: "(adj) bản địa", example: "Native speakers." },
+                { word: "offline", ipa: "/ˈɒflaɪn/", meaning: "(adj) ngoại tuyến", example: "Go offline." },
+                { word: "online", ipa: "/ˈɒnlaɪn/", meaning: "(adj) trực tuyến", example: "Online learning." },
+                { word: "reservation", ipa: "/ˌrezəˈveɪʃn/", meaning: "(n) khu bảo tồn", example: "Indian reservation." },
+                { word: "roundup", ipa: "/ˈraʊndʌp/", meaning: "(n) cuộc lùa gia súc", example: "Cattle roundup." },
+                { word: "serve", ipa: "/sɜːv/", meaning: "(v) phục vụ", example: "Serve dinner." },
+                { word: "skidoo", ipa: "/skɪˈduː/", meaning: "(n) xe trượt tuyết cơ giới", example: "Drive a skidoo." },
+                { word: "sled", ipa: "/sled/", meaning: "(n) xe trượt tuyết", example: "Ride a sled." },
+                { word: "street food", ipa: "/striːt fuːd/", meaning: "(n) đồ ăn đường phố", example: "Delicious street food." },
+                { word: "tribal", ipa: "/ˈtraɪbl/", meaning: "(adj) thuộc bộ lạc", example: "Tribal customs." },
+                { word: "virtual", ipa: "/ˈvɜːtʃuəl/", meaning: "(adj) ảo", example: "Virtual tour." },
+                { word: "welfare", ipa: "/ˈwelfeə(r)/", meaning: "(n) phúc lợi", example: "Social welfare." }
+            ],
+            "Tiếng Anh 8 - Unit 7: Environmental Protection": [
+                { word: "biodiversity", ipa: "/ˌbaɪəʊdaɪˈvɜːsəti/", meaning: "(n) sự đa dạng sinh học", example: "Protect biodiversity." },
+                { word: "carbon footprint", ipa: "/ˌkɑːbən ˈfʊtprɪnt/", meaning: "(n) lượng khí thải carbon", example: "Reduce carbon footprint." },
+                { word: "decompose", ipa: "/ˌdiːkəmˈpəʊz/", meaning: "(v) phân hủy", example: "Plastic does not decompose easily." },
+                { word: "deforest", ipa: "/diːˈfɒrɪst/", meaning: "(v) phá rừng", example: "Stop forest destruction." },
+                { word: "dump", ipa: "/dʌmp/", meaning: "(v, n) xả rác / bãi rác", example: "Don't dump garbage." },
+                { word: "eco-friendly", ipa: "/ˌiːkəʊ ˈfrendli/", meaning: "(adj) thân thiện môi trường", example: "Eco-friendly products." },
+                { word: "ecosystem", ipa: "/ˈiːkəʊsɪstəm/", meaning: "(n) hệ sinh thái", example: "Marine ecosystem." },
+                { word: "environment", ipa: "/ɪnˈvaɪrənmənt/", meaning: "(n) môi trường", example: "Protect the environment." },
+                { word: "habitat", ipa: "/ˈhæbɪtæt/", meaning: "(n) môi trường sống", example: "Natural habitat." },
+                { word: "issue", ipa: "/ˈɪʃuː/", meaning: "(n) vấn đề", example: "Environmental issues." },
+                { word: "litter", ipa: "/ˈlɪtə(r)/", meaning: "(v, n) vứt rác bừa bãi", example: "No littering." },
+                { word: "organic", ipa: "/ɔːˈɡænɪk/", meaning: "(adj) hữu cơ", example: "Organic food." },
+                { word: "ozone layer", ipa: "/ˈəʊzəʊn ˈleɪə(r)/", meaning: "(n) tầng ô-dôn", example: "Protect the ozone layer." },
+                { word: "plastic bag", ipa: "/ˈplæstɪk bæɡ/", meaning: "(n) túi ni-lông", example: "Avoid plastic bags." },
+                { word: "pollute", ipa: "/pəˈluːt/", meaning: "(v) gây ô nhiễm", example: "Pollute rivers." },
+                { word: "pollution", ipa: "/pəˈluːʃn/", meaning: "(n) sự ô nhiễm", example: "Air pollution." },
+                { word: "preserve", ipa: "/prɪˈzɜːv/", meaning: "(v) bảo tồn", example: "Preserve nature." },
+                { word: "protect", ipa: "/prəˈtekt/", meaning: "(v) bảo vệ", example: "Protect wildlife." },
+                { word: "recycle", ipa: "/ˌriːˈsaɪkl/", meaning: "(v) tái chế", example: "Recycle paper." },
+                { word: "reuse", ipa: "/ˌriːˈjuːz/", meaning: "(v) tái sử dụng", example: "Reuse bottles." },
+                { word: "single-use", ipa: "/ˌsɪŋɡl ˈjuːs/", meaning: "(adj) dùng một lần", example: "Single-use plastics." },
+                { word: "sort", ipa: "/sɔːt/", meaning: "(v) phân loại", example: "Sort rubbish." },
+                { word: "wildlife", ipa: "/ˈwaɪldlaɪf/", meaning: "(n) động thực vật hoang dã", example: "Save wildlife." }
+            ],
+            "Tiếng Anh 8 - Unit 8: Shopping": [
+                { word: "bargain", ipa: "/ˈbɑːɡən/", meaning: "(n, v) món hời / mặc cả", example: "Good bargain." },
+                { word: "brand", ipa: "/brænd/", meaning: "(n) thương hiệu", example: "Famous brand." },
+                { word: "commercial", ipa: "/kəˈmɜːʃl/", meaning: "(adj) thương mại", example: "Commercial center." },
+                { word: "consumer", ipa: "/kənˈsuːmə(r)/", meaning: "(n) người tiêu dùng", example: "Smart consumer." },
+                { word: "convenient", ipa: "/kənˈviːniənt/", meaning: "(adj) tiện lợi", example: "Convenient shopping." },
+                { word: "discount", ipa: "/ˈdɪskaʊnt/", meaning: "(n) giảm giá", example: "Special discount." },
+                { word: "display", ipa: "/dɪˈspleɪ/", meaning: "(v, n) trưng bày", example: "Goods on display." },
+                { word: "exhibition", ipa: "/ˌeksɪˈbɪʃn/", meaning: "(n) triển lãm", example: "Craft exhibition." },
+                { word: "goods", ipa: "/ɡʊdz/", meaning: "(n) hàng hóa", example: "Consumer goods." },
+                { word: "home-made", ipa: "/ˌhəʊm ˈmeɪd/", meaning: "(adj) tự làm tại nhà", example: "Home-made cake." },
+                { word: "hypermarket", ipa: "/ˈhaɪpəmɑːkɪt/", meaning: "(n) đại siêu thị", example: "Visit a hypermarket." },
+                { word: "local", ipa: "/ˈləʊkl/", meaning: "(adj, n) địa phương", example: "Local market." },
+                { word: "market", ipa: "/ˈmɑːkɪt/", meaning: "(n) chợ", example: "Traditional market." },
+                { word: "open-air market", ipa: "/ˌəʊpən ˈeə(r) ˈmɑːkɪt/", meaning: "(n) chợ ngoài trời", example: "Go to open-air market." },
+                { word: "price tag", ipa: "/ˈpraɪs tæɡ/", meaning: "(n) nhãn giá", example: "Check the price tag." },
+                { word: "quality", ipa: "/ˈkwɒləti/", meaning: "(n) chất lượng", example: "High quality." },
+                { word: "range", ipa: "/reɪndʒ/", meaning: "(n) loại, phạm vi", example: "Wide range of products." },
+                { word: "receipt", ipa: "/rɪˈsiːt/", meaning: "(n) hóa đơn", example: "Keep your receipt." },
+                { word: "reliable", ipa: "/rɪˈlaɪəbl/", meaning: "(adj) đáng tin cậy", example: "Reliable shop." },
+                { word: "sale", ipa: "/seɪl/", meaning: "(n) việc giảm giá", example: "Big sale today." },
+                { word: "shopaholic", ipa: "/ˌʃɒpəˈhɒlɪk/", meaning: "(n) người nghiện mua sắm", example: "She is a shopaholic." },
+                { word: "speciality", ipa: "/ˌspeʃiˈæləti/", meaning: "(n) đặc sản", example: "Local speciality." },
+                { word: "supermarket", ipa: "/ˈsuːpəmɑːkɪt/", meaning: "(n) siêu thị", example: "Local supermarket." }
+            ],
+            "Tiếng Anh 8 - Unit 9: Natural Disasters": [
+                { word: "ash", ipa: "/æʃ/", meaning: "(n) tro núi lửa", example: "Volcanic ash." },
+                { word: "collapse", ipa: "/kəˈlæps/", meaning: "(v, n) sụp đổ", example: "Buildings collapsed." },
+                { word: "damage", ipa: "/ˈdæmɪdʒ/", meaning: "(n, v) thiệt hại", example: "Storm damage." },
+                { word: "disaster", ipa: "/dɪˈzɑːstə(r)/", meaning: "(n) thảm họa", example: "Natural disaster." },
+                { word: "drought", ipa: "/draʊt/", meaning: "(n) hạn hán", example: "Severe drought." },
+                { word: "earthquake", ipa: "/ˈɜːθkweɪk/", meaning: "(n) động đất", example: "Major earthquake." },
+                { word: "emergency kit", ipa: "/ɪˈmɜːdʒənsi kɪt/", meaning: "(n) đồ dùng khẩn cấp", example: "Prepare emergency kit." },
+                { word: "eruption", ipa: "/ɪˈrʌpʃn/", meaning: "(n) sự phun trào", example: "Volcanic eruption." },
+                { word: "evacuate", ipa: "/ɪˈvækjueɪt/", meaning: "(v) sơ tán", example: "Evacuate residents." },
+                { word: "famine", ipa: "/ˈfæmɪn/", meaning: "(n) nạn đói", example: "Causing famine." },
+                { word: "flood", ipa: "/flʌd/", meaning: "(n, v) lũ lụt", example: "Heavy flood." },
+                { word: "landslide", ipa: "/ˈlændslaɪd/", meaning: "(n) sạt lở đất", example: "Mountain landslide." },
+                { word: "loss", ipa: "/lɒs/", meaning: "(n) sự mất mát", example: "Heavy loss of life." },
+                { word: "magnitude", ipa: "/ˈmæɡnɪtjuːd/", meaning: "(n) cường độ", example: "Magnitude 6.0 earthquake." },
+                { word: "predict", ipa: "/prɪˈdɪkt/", meaning: "(v) dự báo", example: "Predict disasters." },
+                { word: "property", ipa: "/ˈprɒpəti/", meaning: "(n) tài sản", example: "Damage property." },
+                { word: "rescue", ipa: "/ˈreskjuː/", meaning: "(v, n) cứu hộ", example: "Rescue victims." },
+                { word: "shake", ipa: "/ʃeɪk/", meaning: "(v) rung lắc", example: "The ground shook." },
+                { word: "storm", ipa: "/stɔːm/", meaning: "(n) cơn bão", example: "Tropical storm." },
+                { word: "tornado", ipa: "/tɔːˈneɪdəʊ/", meaning: "(n) lốc xoáy", example: "Violent tornado." },
+                { word: "tsunami", ipa: "/tsuːˈnɑːmi/", meaning: "(n) sóng thần", example: "Destructive tsunami." },
+                { word: "victim", ipa: "/ˈvɪktɪm/", meaning: "(n) nạn nhân", example: "Help flood victims." },
+                { word: "volcano", ipa: "/vɒlˈkeɪnəʊ/", meaning: "(n) núi lửa", example: "Active volcano." },
+                { word: "warning", ipa: "/ˈwɔːnɪŋ/", meaning: "(n) lời cảnh báo", example: "Issue a warning." }
+            ],
+            "Tiếng Anh 8 - Unit 10: Communication in Future": [
+                { word: "audio message", ipa: "/ˈɔːdiəʊ ˈmesɪdʒ/", meaning: "(n) tin nhắn âm thanh", example: "Send an audio message." },
+                { word: "communicate", ipa: "/kəˈmjuːnɪkeɪt/", meaning: "(v) giao tiếp", example: "Communicate globally." },
+                { word: "communication", ipa: "/kəˌmjuːnɪˈkeɪʃn/", meaning: "(n) sự giao tiếp", example: "Future communication." },
+                { word: "connect", ipa: "/kəˈnekt/", meaning: "(v) kết nối", example: "Connect with friends." },
+                { word: "cyberspace", ipa: "/ˈsaɪbəspeɪs/", meaning: "(n) không gian mạng", example: "Explore cyberspace." },
+                { word: "device", ipa: "/dɪˈvaɪs/", meaning: "(n) thiết bị", example: "Smart device." },
+                { word: "emoji", ipa: "/ɪˈməʊdʒi/", meaning: "(n) biểu tượng cảm xúc", example: "Use funny emojis." },
+                { word: "face-to-face", ipa: "/ˌfeɪs tə ˈfeɪs/", meaning: "(adj, adv) trực tiếp", example: "Face-to-face chat." },
+                { word: "global", ipa: "/ˈɡləʊbl/", meaning: "(adj) toàn cầu", example: "Global network." },
+                { word: "hologram", ipa: "/ˈhɒləɡræm/", meaning: "(n) ảnh 3 chiều", example: "3D hologram." },
+                { word: "instant messaging", ipa: "/ˈɪnstənt ˈmesɪdʒɪŋ/", meaning: "(n) nhắn tin tức thời", example: "Use instant messaging." },
+                { word: "interaction", ipa: "/ˌɪntərˈækʃn/", meaning: "(n) sự tương tác", example: "Human interaction." },
+                { word: "multimedia", ipa: "/ˌmʌltiˈmiːdiə/", meaning: "(n) đa phương tiện", example: "Multimedia lesson." },
+                { word: "netiquette", ipa: "/ˈnetɪket/", meaning: "(n) phép lịch sự mạng", example: "Practice netiquette." },
+                { word: "network", ipa: "/ˈnetwɜːk/", meaning: "(n) mạng lưới", example: "Social network." },
+                { word: "social media", ipa: "/ˌsəʊʃl ˈmiːdiə/", meaning: "(n) mạng xã hội", example: "Post on social media." },
+                { word: "telepathy", ipa: "/təˈlepəθi/", meaning: "(n) thần giao cách cảm", example: "Use telepathy." },
+                { word: "translate", ipa: "/trænzˈleɪt/", meaning: "(v) dịch thuật", example: "Translate languages." },
+                { word: "video conference", ipa: "/ˈvɪdiəʊ ˈkɒnfərəns/", meaning: "(n) hội nghị video", example: "Join video conference." },
+                { word: "voice recognition", ipa: "/vɔɪs ˌrekəɡˈnɪʃn/", meaning: "(n) nhận diện giọng nói", example: "Voice recognition software." }
+            ],
+            "Tiếng Anh 8 - Unit 11: Science & Technology": [
+                { word: "artificial", ipa: "/ˌɑːtɪˈfɪʃl/", meaning: "(adj) nhân tạo", example: "Artificial flowers." },
+                { word: "artificial intelligence", ipa: "/ˌɑːtɪˈfɪʃl ɪnˈtelɪdʒəns/", meaning: "(n) trí tuệ nhân tạo (AI)", example: "Develop AI." },
+                { word: "biometrics", ipa: "/ˌbaɪəʊˈmetrɪks/", meaning: "(n) sinh trắc học", example: "Biometric security." },
+                { word: "breakthrough", ipa: "/ˈbreɪkθruː/", meaning: "(n) bước đột phá", example: "Scientific breakthrough." },
+                { word: "discovery", ipa: "/dɪˈskʌvəri/", meaning: "(n) sự khám phá", example: "Exciting discovery." },
+                { word: "download", ipa: "/ˌdaʊnˈləʊd/", meaning: "(v) tải xuống", example: "Download files." },
+                { word: "engineer", ipa: "/ˌendʒɪˈnɪə(r)/", meaning: "(n) kỹ sư", example: "Software engineer." },
+                { word: "experiment", ipa: "/ɪkˈsperɪmənt/", meaning: "(n, v) thí nghiệm", example: "Science experiment." },
+                { word: "gadget", ipa: "/ˈɡædʒɪt/", meaning: "(n) thiết bị thông minh", example: "High-tech gadgets." },
+                { word: "innovation", ipa: "/ˌɪnəˈveɪʃn/", meaning: "(n) sự đổi mới", example: "Tech innovation." },
+                { word: "innovative", ipa: "/ˈɪnəvətɪv/", meaning: "(adj) mang tính đổi mới", example: "Innovative ideas." },
+                { word: "invention", ipa: "/ɪnˈvenʃn/", meaning: "(n) sự phát minh", example: "Great inventions." },
+                { word: "inventor", ipa: "/ɪnˈventə(r)/", meaning: "(n) nhà phát minh", example: "Famous inventor." },
+                { word: "laboratory", ipa: "/ləˈbɒrətri/", meaning: "(n) phòng thí nghiệm", example: "Science laboratory." },
+                { word: "progress", ipa: "/ˈprəʊɡres/", meaning: "(n) sự tiến bộ", example: "Make good progress." },
+                { word: "research", ipa: "/rɪˈsɜːtʃ/", meaning: "(n, v) nghiên cứu", example: "Do research." },
+                { word: "robotics", ipa: "/rəʊˈbɒtɪks/", meaning: "(n) khoa học robot", example: "Study robotics." },
+                { word: "science", ipa: "/ˈsaɪəns/", meaning: "(n) khoa học", example: "Science subject." },
+                { word: "scientist", ipa: "/ˈsaɪəntɪst/", meaning: "(n) nhà khoa học", example: "Famous scientist." },
+                { word: "software", ipa: "/ˈsɒftweə(r)/", meaning: "(n) phần mềm", example: "Computer software." },
+                { word: "technical", ipa: "/ˈteknɪkl/", meaning: "(adj) thuộc kỹ thuật", example: "Technical support." },
+                { word: "technology", ipa: "/tekˈnɒlədʒi/", meaning: "(n) công nghệ", example: "Modern technology." }
+            ],
+            "Tiếng Anh 8 - Unit 12: Life on Other Planets": [
+                { word: "alien", ipa: "/ˈeɪliən/", meaning: "(n) người ngoài hành tinh", example: "Do aliens exist?" },
+                { word: "astronaut", ipa: "/ˈæstrənɔːt/", meaning: "(n) phi hành gia", example: "Brave astronauts." },
+                { word: "astronomer", ipa: "/əˈstrɒnəmə(r)/", meaning: "(n) nhà thiên văn học", example: "Astronomers study space." },
+                { word: "atmosphere", ipa: "/ˈætməsfɪə(r)/", meaning: "(n) bầu khí quyển", example: "Mars atmosphere." },
+                { word: "capture", ipa: "/ˈkæptʃə(r)/", meaning: "(v) chụp lại", example: "Capture images." },
+                { word: "civilisation", ipa: "/ˌsɪvəlaɪˈzeɪʃn/", meaning: "(n) nền văn minh", example: "Ancient civilisation." },
+                { word: "crater", ipa: "/ˈkreɪtə(r)/", meaning: "(n) hố thiên thạch", example: "Lunar craters." },
+                { word: "extraterrestrial", ipa: "/ˌekstrətəˈrestriəl/", meaning: "(adj) ngoài Trái Đất", example: "Extraterrestrial life." },
+                { word: "galaxy", ipa: "/ˈɡæləksi/", meaning: "(n) thiên hà", example: "Milky Way galaxy." },
+                { word: "gravity", ipa: "/ˈɡrævəti/", meaning: "(n) trọng lực", example: "Zero gravity." },
+                { word: "microorganism", ipa: "/ˈmaɪkrəʊˌɔːɡənɪzm/", meaning: "(n) vi sinh vật", example: "Alien microorganisms." },
+                { word: "orbit", ipa: "/ˈɔːbɪt/", meaning: "(n, v) quỹ đạo", example: "Earth orbit." },
+                { word: "planet", ipa: "/ˈplænɪt/", meaning: "(n) hành tinh", example: "Red planet Mars." },
+                { word: "rocket", ipa: "/ˈrɒkɪt/", meaning: "(n) tên lửa", example: "Space rocket." },
+                { word: "satellite", ipa: "/ˈsætəlaɪt/", meaning: "(n) vệ tinh", example: "Communication satellite." },
+                { word: "solar system", ipa: "/ˈsəʊlə(r) ˈsɪstəm/", meaning: "(n) hệ Mặt Trời", example: "Planets in solar system." },
+                { word: "spacecraft", ipa: "/ˈspeɪskrɑːft/", meaning: "(n) tàu vũ trụ", example: "Launch a spacecraft." },
+                { word: "spaceship", ipa: "/ˈspeɪsʃɪp/", meaning: "(n) tàu không gian", example: "Alien spaceship." },
+                { word: "surface", ipa: "/ˈsɜːfɪs/", meaning: "(n) bề mặt", example: "Moon surface." },
+                { word: "telescope", ipa: "/ˈtelɪskəʊp/", meaning: "(n) kính viễn vọng", example: "Look through a telescope." },
+                { word: "UFO", ipa: "/ˌjuː ef ˈəʊ/", meaning: "(n) đĩa bay UFO", example: "Spot a UFO." },
+                { word: "universe", ipa: "/ˈjuːnɪvɜːs/", meaning: "(n) vũ trụ", example: "The vast universe." },
+                { word: "weightless", ipa: "/ˈweɪtləs/", meaning: "(adj) không trọng lực", example: "Weightless in space." }
+            ]
+        };
+
+        let decks = JSON.parse(localStorage.getItem("chiikawa_flashcard_decks")) || initialDecks;
+        let currentDeckKey = localStorage.getItem("chiikawa_flashcard_current") || Object.keys(decks)[0];
+        let currentIndex = 0;
+        let isFlipped = false;
+        let soundEnabled = JSON.parse(localStorage.getItem("chiikawa_flashcard_sound")) ?? true;
+
+        function init() {
+            if (!decks[currentDeckKey]) currentDeckKey = Object.keys(decks)[0];
+            if (localStorage.getItem("theme") === "light") {
+                document.documentElement.classList.remove("dark");
+                document.getElementById("theme-icon").className = "fa-solid fa-sun text-amber-500 text-lg";
+            }
+            renderDeckSelect();
+            updateStudyView();
+            renderManageCards();
+            updateSoundIcon();
+        }
+
+        function saveData() {
+            localStorage.setItem("chiikawa_flashcard_decks", JSON.stringify(decks));
+            localStorage.setItem("chiikawa_flashcard_current", currentDeckKey);
+        }
+
+        function renderDeckSelect() {
+            const select = document.getElementById("deck-select");
+            select.innerHTML = "";
+            Object.keys(decks).forEach(name => {
+                const opt = document.createElement("option");
+                opt.value = name;
+                opt.textContent = `${name} (${decks[name].length} từ)`;
+                if (name === currentDeckKey) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        function changeDeck(name) {
+            currentDeckKey = name;
+            currentIndex = 0;
+            saveData();
+            updateStudyView();
+            renderManageCards();
+        }
+
+        function switchTab(tab) {
+            ['study', 'quiz', 'game', 'manage'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}-btn`).className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 whitespace-nowrap";
+            });
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}-btn`).className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white dark:bg-slate-800 text-pink-600 dark:text-pink-400 shadow-md whitespace-nowrap";
+
+            if (tab === 'quiz') startQuiz();
+            if (tab === 'game') initGame();
+        }
+
+        function updateStudyView() {
+            const cards = decks[currentDeckKey] || [];
+            const flashcard = document.getElementById("flashcard");
+            isFlipped = false;
+            flashcard.classList.remove("rotate-y-180");
+
+            if (cards.length === 0) {
+                document.getElementById("card-word").textContent = "(｡•́︿•̀｡) Trống";
+                document.getElementById("card-ipa").textContent = "";
+                document.getElementById("card-meaning").textContent = "Hãy thêm từ vựng mới nhé!";
+                document.getElementById("card-example").textContent = "";
+                document.getElementById("progress-text").textContent = "0 / 0";
+                document.getElementById("progress-bar").style.width = "0%";
+                return;
+            }
+
+            if (currentIndex >= cards.length) currentIndex = 0;
+            const card = cards[currentIndex];
+
+            document.getElementById("card-word").textContent = card.word;
+            document.getElementById("card-ipa").textContent = card.ipa || "";
+            document.getElementById("card-meaning").textContent = card.meaning;
+            document.getElementById("card-example").textContent = card.example ? `Ví dụ: ${card.example}` : "";
+
+            document.getElementById("progress-text").textContent = `${currentIndex + 1} / ${cards.length}`;
+            document.getElementById("progress-bar").style.width = `${((currentIndex + 1) / cards.length) * 100}%`;
+        }
+
+        function flipCard() {
+            const cards = decks[currentDeckKey] || [];
+            if (cards.length === 0) return;
+            isFlipped = !isFlipped;
+            document.getElementById("flashcard").classList.toggle("rotate-y-180", isFlipped);
+        }
+
+        function markCard(learned) {
+            const cards = decks[currentDeckKey] || [];
+            if (cards.length === 0) return;
+            if (learned && currentIndex === cards.length - 1) {
+                confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+            }
+            currentIndex = (currentIndex + 1) % cards.length;
+            updateStudyView();
+        }
+
+        function speakWord(event, isMeaning = false) {
+            event.stopPropagation();
+            if (!soundEnabled) return;
+            const cards = decks[currentDeckKey] || [];
+            if (cards.length === 0) return;
+            
+            const text = isMeaning ? cards[currentIndex].meaning : cards[currentIndex].word;
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = isMeaning ? 'vi-VN' : 'en-US';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function startQuiz() {
+            const cards = decks[currentDeckKey] || [];
+            if (cards.length < 2) {
+                document.getElementById("quiz-question").textContent = "Cần ít nhất 2 từ vựng để làm trắc nghiệm!";
+                document.getElementById("quiz-options").innerHTML = "";
+                return;
+            }
+            const correct = cards[Math.floor(Math.random() * cards.length)];
+            document.getElementById("quiz-question").textContent = correct.word;
+
+            let opts = [correct.meaning];
+            while (opts.length < Math.min(4, cards.length)) {
+                const rand = cards[Math.floor(Math.random() * cards.length)].meaning;
+                if (!opts.includes(rand)) opts.push(rand);
+            }
+            opts.sort(() => Math.random() - 0.5);
+
+            const container = document.getElementById("quiz-options");
+            container.innerHTML = "";
+            opts.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.className = "w-full p-4 text-left rounded-2xl bg-slate-50 dark:bg-slate-700/60 hover:bg-pink-500 hover:text-white font-bold border border-slate-200 dark:border-slate-600 transition-all text-sm shadow-sm";
+                btn.textContent = opt;
+                btn.onclick = () => {
+                    if (opt === correct.meaning) {
+                        btn.className = "w-full p-4 text-left rounded-2xl bg-emerald-500 text-white font-bold text-sm shadow-md";
+                        setTimeout(startQuiz, 700);
+                    } else {
+                        btn.className = "w-full p-4 text-left rounded-2xl bg-rose-500 text-white font-bold text-sm shadow-md";
+                    }
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        let selectedTile = null;
+        let gameScore = 0;
+        function initGame() {
+            const cards = decks[currentDeckKey] || [];
+            if (cards.length < 4) {
+                document.getElementById("game-board").innerHTML = "<p class='col-span-full text-sm text-slate-400 py-6'>Cần ít nhất 4 từ vựng để chơi ghép cặp!</p>";
+                return;
+            }
+            gameScore = 0;
+            document.getElementById("game-score").textContent = gameScore;
+            
+            let subset = [...cards].sort(() => Math.random() - 0.5).slice(0, 4);
+            let items = [];
+            subset.forEach(c => {
+                items.push({ text: c.word, match: c.word, type: 'word' });
+                items.push({ text: c.meaning, match: c.word, type: 'meaning' });
+            });
+            items.sort(() => Math.random() - 0.5);
+
+            const board = document.getElementById("game-board");
+            board.innerHTML = "";
+            items.forEach(item => {
+                const tile = document.createElement("button");
+                tile.className = "p-3 bg-pink-50 dark:bg-slate-700 hover:bg-pink-500 hover:text-white rounded-2xl font-bold text-xs sm:text-sm transition-all border border-pink-100 dark:border-slate-600 h-24 flex items-center justify-center text-center shadow-sm";
+                tile.textContent = item.text;
+                tile.onclick = () => {
+                    if (tile.classList.contains('bg-emerald-500')) return;
+                    if (!selectedTile) {
+                        selectedTile = { tile, item };
+                        tile.classList.add("ring-4", "ring-pink-400", "scale-105");
+                    } else {
+                        selectedTile.tile.classList.remove("ring-4", "ring-pink-400", "scale-105");
+                        if (selectedTile.item.match === item.match && selectedTile.item.type !== item.type) {
+                            tile.classList.add("bg-emerald-500", "text-white");
+                            selectedTile.tile.classList.add("bg-emerald-500", "text-white");
+                            gameScore += 10;
+                            document.getElementById("game-score").textContent = gameScore;
+                            if (gameScore === subset.length * 10) {
+                                confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+                            }
+                        }
+                        selectedTile = null;
+                    }
+                };
+                board.appendChild(tile);
+            });
+        }
+
+        function renderManageCards() {
+            const cards = decks[currentDeckKey] || [];
+            document.getElementById("manage-card-count").textContent = cards.length;
+            const list = document.getElementById("card-list");
+            list.innerHTML = "";
+            cards.forEach((c, idx) => {
+                const item = document.createElement("div");
+                item.className = "p-3 bg-slate-50 dark:bg-slate-700/50 rounded-2xl border border-slate-200 dark:border-slate-600 flex justify-between items-center gap-3";
+                item.innerHTML = `
+                    <div class="truncate text-sm"><strong>${c.word}</strong> <span class="text-pink-500">${c.ipa || ''}</span> - ${c.meaning}</div>
+                    <button onclick="deleteCard(${idx})" class="text-slate-400 hover:text-rose-500 p-1.5 rounded-xl hover:bg-rose-50"><i class="fa-solid fa-trash text-sm"></i></button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function addSingleCard() {
+            const word = document.getElementById("input-word").value.trim();
+            const ipa = document.getElementById("input-ipa").value.trim();
+            const meaning = document.getElementById("input-meaning").value.trim();
+            const example = document.getElementById("input-example").value.trim();
+            if (!word || !meaning) return;
+
+            decks[currentDeckKey].push({ word, ipa, meaning, example });
+            document.getElementById("input-word").value = "";
+            document.getElementById("input-ipa").value = "";
+            document.getElementById("input-meaning").value = "";
+            document.getElementById("input-example").value = "";
+
+            saveData();
+            renderDeckSelect();
+            renderManageCards();
+            updateStudyView();
+        }
+
+        function importBulkCards() {
+            const text = document.getElementById("bulk-input").value.trim();
+            if (!text) return;
+            text.split("\n").forEach(line => {
+                const parts = line.split(/[-:]/);
+                if (parts.length >= 2) {
+                    decks[currentDeckKey].push({ word: parts[0].trim(), meaning: parts.slice(1).join("-").trim(), ipa: "", example: "" });
+                }
+            });
+            document.getElementById("bulk-input").value = "";
+            saveData();
+            renderDeckSelect();
+            renderManageCards();
+            updateStudyView();
+            alert("Đã thêm danh sách thành công! (✿◠‿◠)");
+        }
+
+        function deleteCard(idx) {
+            decks[currentDeckKey].splice(idx, 1);
+            saveData();
+            renderDeckSelect();
+            renderManageCards();
+            updateStudyView();
+        }
+
+        function deleteCurrentDeck() {
+            if (confirm(`Bạn có chắc muốn xóa bộ thẻ "${currentDeckKey}" không?`)) {
+                delete decks[currentDeckKey];
+                const keys = Object.keys(decks);
+                currentDeckKey = keys.length > 0 ? keys[0] : "Bộ mới";
+                if (keys.length === 0) decks["Bộ mới"] = [];
+                saveData();
+                renderDeckSelect();
+                renderManageCards();
+                updateStudyView();
+            }
+        }
+
+        function openNewDeckModal() { document.getElementById("modal-new-deck").classList.remove("hidden"); }
+        function closeNewDeckModal() { document.getElementById("modal-new-deck").classList.add("hidden"); }
+        function createNewDeck() {
+            const name = document.getElementById("new-deck-name").value.trim();
+            if (name) {
+                decks[name] = [];
+                currentDeckKey = name;
+                document.getElementById("new-deck-name").value = "";
+                saveData();
+                renderDeckSelect();
+                renderManageCards();
+                updateStudyView();
+                closeNewDeckModal();
+            }
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle("dark");
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+            document.getElementById("theme-icon").className = isDark ? "fa-solid fa-moon text-lg" : "fa-solid fa-sun text-amber-500 text-lg";
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem("chiikawa_flashcard_sound", JSON.stringify(soundEnabled));
+            updateSoundIcon();
+        }
+
+        function updateSoundIcon() {
+            document.getElementById("sound-icon").className = soundEnabled ? "fa-solid fa-volume-high text-lg" : "fa-solid fa-volume-xmark text-lg text-slate-400";
+        }
+
+        document.addEventListener("keydown", (e) => {
+            if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+            if (e.code === "Space") { e.preventDefault(); flipCard(); }
+            if (e.code === "ArrowLeft") markCard(false);
+            if (e.code === "ArrowRight") markCard(true);
+        });
+
+        init();
+    </script>
+</body>
+</html>
